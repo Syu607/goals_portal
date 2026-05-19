@@ -29,6 +29,12 @@ git push -u origin master
 
 This repo includes `api/index.py` and `vercel.json` for Vercel deployment.
 
+Recommended Vercel env var:
+
+- `SESSION_SECRET` = any long random string (keeps sessions stable across restarts)
+
+Note: SQLite runs from ephemeral storage on Vercel (`/tmp`). This is fine for demo, but data may reset on cold starts.
+
 ```bash
 cd C:\Users\msiza\Desktop\atomquest-goals-portal
 npm i -g vercel
