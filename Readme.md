@@ -51,7 +51,6 @@ vercel --prod
 
 ## Architecture diagram
 
-```mermaid
 flowchart LR
   U[Browser\n(Employee / Manager / Admin)] -->|HTTP| W[FastAPI Web App\nServer-rendered UI (Jinja2)\nRole-based routes]
   W --> A[Auth\nSession cookie]
@@ -60,7 +59,6 @@ flowchart LR
   W --> R[Reporting\nCSV export + completion dashboard]
   W --> L[Audit Trail\nField-level change logs after unlock]
   W --> D[(SQLite DB)]
-```
 
 ## Requirement coverage (Phase 1 + Phase 2)
 
