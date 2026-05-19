@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import tempfile
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -26,7 +27,12 @@ from app.services.security import hash_password
 
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-DATA_DIR = ROOT_DIR / "data"
+
+if os.getenv("VERCEL") is not None:
+    DATA_DIR = Path(tempfile.gettempdir()) / "atomquest_goals_portal"
+else:
+    DATA_DIR = ROOT_DIR / "data"
+
 DB_PATH = DATA_DIR / "portal.db"
 
 

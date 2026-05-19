@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import secrets
 from pathlib import Path
 
@@ -14,7 +15,7 @@ from app.routers import admin, auth, employee, manager
 def create_app() -> FastAPI:
     app = FastAPI(title="AtomQuest Goal Setting & Tracking Portal")
 
-    secret_key = secrets.token_urlsafe(32)
+    secret_key = os.getenv("SESSION_SECRET") or secrets.token_urlsafe(32)
     app.add_middleware(SessionMiddleware, secret_key=secret_key, same_site="lax")
 
     static_dir = Path(__file__).resolve().parent / "static"
