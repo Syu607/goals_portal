@@ -31,6 +31,7 @@ def root(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
 @router.get("/login", response_class=HTMLResponse)
 def login_form(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
+        request,
         "login.html",
         {"request": request, "error": "", "prefill_user": "", "prefill_pass": ""},
     )
@@ -46,6 +47,7 @@ def login(
     user = db.scalar(select(User).where(User.username == username.strip()))
     if user is None or not verify_password(password, user.password_hash):
         return templates.TemplateResponse(
+            request,
             "login.html",
             {"request": request, "error": "Invalid username or password.", "prefill_user": username, "prefill_pass": ""},
             status_code=401,

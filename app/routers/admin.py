@@ -96,6 +96,7 @@ def dashboard(
             )
             completion[emp.id][q.value] = {"employee": emp_done, "manager": mgr_done}
     return templates.TemplateResponse(
+        request,
         "admin_dashboard.html",
         {
             "request": request,
@@ -131,6 +132,7 @@ def admin_sheet(
     sheet = _get_or_create_sheet(db, employee=employee, cycle=cycle)
     goals = list(sheet.goals)
     return templates.TemplateResponse(
+        request,
         "admin_sheet.html",
         {"request": request, "user": user, "cycle": cycle, "employee": employee, "sheet": sheet, "goals": goals, "UomType": UomType},
     )
@@ -222,6 +224,7 @@ def audit_view(
     logs = list(db.scalars(select(AuditLog).order_by(desc(AuditLog.created_at)).limit(200)))
     actors = {u.id: u for u in db.scalars(select(User).where(User.id.in_({l.actor_id for l in logs})))}
     return templates.TemplateResponse(
+        request,
         "admin_audit.html",
         {"request": request, "user": user, "logs": logs, "actors": actors},
     )

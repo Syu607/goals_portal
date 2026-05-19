@@ -61,6 +61,7 @@ def dashboard(
     team = _team_members(db, user)
     sheets = {m.id: _get_or_create_sheet(db, employee=m, cycle=cycle) for m in team}
     return templates.TemplateResponse(
+        request,
         "manager_dashboard.html",
         {"request": request, "user": user, "cycle": cycle, "team": team, "sheets": sheets, "Quarter": Quarter},
     )
@@ -81,6 +82,7 @@ def review_sheet(
     goals = list(sheet.goals)
     weight_total = sum(g.weightage for g in goals)
     return templates.TemplateResponse(
+        request,
         "manager_sheet.html",
         {
             "request": request,
@@ -181,6 +183,7 @@ def shared_goals_form(
     cycle = _active_cycle(db)
     team = _team_members(db, user)
     return templates.TemplateResponse(
+        request,
         "manager_shared_goals.html",
         {"request": request, "user": user, "cycle": cycle, "team": team, "UomType": UomType},
     )
@@ -296,6 +299,7 @@ def checkin_view(
         )
     )
     return templates.TemplateResponse(
+        request,
         "manager_checkin.html",
         {
             "request": request,

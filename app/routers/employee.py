@@ -60,6 +60,7 @@ def dashboard(
     goal_setting_window = window_for_cycle(cycle, None)
     can_edit_goals = is_goal_setting_open(cycle, date.today()) and sheet.status == GoalSheetStatus.draft and sheet.locked == 0
     return templates.TemplateResponse(
+        request,
         "employee_dashboard.html",
         {
             "request": request,
@@ -203,6 +204,7 @@ def quarter_form(
         ach = db.scalar(select(GoalAchievement).where(GoalAchievement.goal_id == source_goal.id, GoalAchievement.quarter == quarter))
         goal_rows.append({"goal": g, "source_goal": source_goal, "achievement": ach})
     return templates.TemplateResponse(
+        request,
         "employee_quarter.html",
         {
             "request": request,
