@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import enum
 from datetime import date, datetime
+from typing import Optional
 
 from sqlalchemy import Date, DateTime, Enum, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -53,8 +54,8 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[Role] = mapped_column(Enum(Role), index=True)
 
-    manager_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
-    manager: Mapped[User | None] = relationship(remote_side=[id], back_populates="direct_reports")
+    manager_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    manager: Mapped[Optional[User]] = relationship(remote_side=[id], back_populates="direct_reports")
     direct_reports: Mapped[list[User]] = relationship(back_populates="manager")
 
     goal_sheets: Mapped[list["GoalSheet"]] = relationship(back_populates="employee", foreign_keys="GoalSheet.employee_id")
@@ -85,14 +86,14 @@ class GoalSheet(Base):
     cycle_id: Mapped[int] = mapped_column(ForeignKey("cycles.id"), index=True)
     status: Mapped[GoalSheetStatus] = mapped_column(Enum(GoalSheetStatus), default=GoalSheetStatus.draft)
     locked: Mapped[int] = mapped_column(Integer, default=0, index=True)
-    submitted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    approved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    approved_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    submitted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    approved_by_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
 
     employee: Mapped[User] = relationship(back_populates="goal_sheets", foreign_keys=[employee_id])
     cycle: Mapped[Cycle] = relationship(back_populates="goal_sheets")
     goals: Mapped[list[Goal]] = relationship(back_populates="sheet", cascade="all, delete-orphan")
-    approved_by: Mapped[User | None] = relationship(foreign_keys=[approved_by_id])
+    approved_by: Mapped[Optional[User]] = relationship(foreign_keys=[approved_by_id])
 
 
 class SharedGoalGroup(Base):
@@ -123,12 +124,12 @@ class Goal(Base):
     target_value: Mapped[str] = mapped_column(String(120))
     weightage: Mapped[int] = mapped_column(Integer)
 
-    shared_group_id: Mapped[int | None] = mapped_column(ForeignKey("shared_goal_groups.id"), nullable=True, index=True)
-    primary_owner_goal_id: Mapped[int | None] = mapped_column(ForeignKey("goals.id"), nullable=True, index=True)
+    shared_group_id: Mapped[Optional[int]] = mapped_column(ForeignKey("shared_goal_groups.id"), nullable=True, index=True)
+    primary_owner_goal_id: Mapped[Optional[int]] = mapped_column(ForeignKey("goals.id"), nullable=True, index=True)
 
     sheet: Mapped[GoalSheet] = relationship(back_populates="goals", foreign_keys=[sheet_id])
-    shared_group: Mapped[SharedGoalGroup | None] = relationship(back_populates="goals", foreign_keys=[shared_group_id])
-    primary_owner_goal: Mapped[Goal | None] = relationship(remote_side=[id], foreign_keys=[primary_owner_goal_id])
+    shared_group: Mapped[Optional[SharedGoalGroup]] = relationship(back_populates="goals", foreign_keys=[shared_group_id])
+    primary_owner_goal: Mapped[Optional[Goal]] = relationship(remote_side=[id], foreign_keys=[primary_owner_goal_id])
 
     achievements: Mapped[list[GoalAchievement]] = relationship(back_populates="goal", cascade="all, delete-orphan")
 

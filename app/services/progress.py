@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
+from typing import Optional
 
 from app.models import UomType
 
@@ -30,7 +31,7 @@ def compute_progress_score(uom_type: UomType, target_value: str, actual_value: s
     return 0
 
 
-def _to_float(value: str) -> float | None:
+def _to_float(value: str) -> Optional[float]:
     try:
         cleaned = value.strip().replace("%", "")
         if cleaned == "":
@@ -40,7 +41,7 @@ def _to_float(value: str) -> float | None:
         return None
 
 
-def _to_date(value: str) -> date | None:
+def _to_date(value: str) -> Optional[date]:
     try:
         v = value.strip()
         if v == "":

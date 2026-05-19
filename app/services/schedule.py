@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, timedelta
+from typing import Optional
 
 from app.models import Cycle, Quarter
 
@@ -15,7 +16,7 @@ class Window:
         return self.opens <= on <= self.closes
 
 
-def window_for_cycle(cycle: Cycle, quarter: Quarter | None) -> Window:
+def window_for_cycle(cycle: Cycle, quarter: Optional[Quarter]) -> Window:
     if quarter is None:
         opens = cycle.goal_setting_open
     elif quarter == Quarter.q1:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
+from typing import Optional
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -116,7 +117,7 @@ def update_goal(
     thrust_area: str = Form(""),
     title: str = Form(""),
     description: str = Form(""),
-    uom_type: UomType | None = Form(None),
+    uom_type: Optional[UomType] = Form(None),
     target_value: str = Form(""),
     weightage: int = Form(...),
     db: Session = Depends(get_db),
