@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h2 class="mb-1">Admin: Goal Sheet</h2>
+    <div class="text-muted">{{ employee.full_name }} ({{ employee.username }}) | Cycle {{ cycle.year }}</div>
+  </div>
+  <a class="btn btn-outline-secondary" href="/admin">Back</a>
+</div>
+
+<div class="mb-3 d-flex align-items-center gap-2">
+  <span class="badge bg-secondary">Status: {{ sheet.status.value }}</span>
+  {% if sheet.locked %}<span class="badge bg-dark">Locked</span>{% else %}<span class="badge bg-light text-dark">Unlocked</span>{% endif %}
+  {% if sheet.locked %}
+    <form method="post" action="/admin/sheet/{{ sheet.id }}/unlock">
+      <button class="btn btn-outline-warning btn-sm" type="submit">Unlock</button>
+    </form>
+  {% else %}
+    <form method="post" action="/admin/sheet/{{ sheet.id }}/lock">
+      <button class="btn btn-outline-dark btn-sm" type="submit">Lock</button>
+    </form>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="card-header">Goals</div>
+  <div class="card-body">
+    {% if goals|length == 0 %}
+      <div class="text-muted">No goals.</div>
+    {% else %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Goal</th>
+              <th>UoM</th>
+              <th>Target</th>
+              <th class="text-end">Weight %</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for g in goals %}
+            <tr>
+              <td>
+                <div class="fw-semibold">{{ g.title }}</div>
+                <div class="small text-muted">{{ g.thrust_area }}</div>
+                {% if g.shared_group_id %}
+                  <div class="small text-muted">Shared goal{% if g.primary_owner_goal_id %} (recipient){% else %} (primary){% endif %}</div>
+                {% endif %}
+              </td>
+              <td class="text-nowrap">{{ g.uom_type.value }}</td>
+              <td class="text-nowrap">{{ g.target_value }}</td>
+              <td class="text-end">{{ g.weightage }}</td>
+              <td class="text-end">
+                <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#ag{{ g.id }}">Edit</button>
+              </td>
+            </tr>
+            <tr class="collapse" id="ag{{ g.id }}">
+              <td colspan="5">
+                <form method="post" action="/admin/sheet/{{ sheet.id }}/goal/{{ g.id }}" class="row g-2">
+                  <div class="col-12 col-md-2">
+                    <label class="form-label mb-1">Thrust</label>
+                    <input class="form-control" name="thrust_area" value="{{ g.thrust_area }}" required {% if sheet.locked %}disabled{% endif %}>
+                  </div>
+                  <div class="col-12 col-md-4">
+                    <label class="form-label mb-1">Title</label>
+                    <input class="form-control" name="title" value="{{ g.title }}" required {% if sheet.locked %}disabled{% endif %}>
+                  </div>
+                  <div class="col-12 col-md-2">
+                    <label class="form-label mb-1">UoM</label>
+                    <select class="form-select" name="uom_type" required {% if sheet.locked %}disabled{% endif %}>
+                      <option value="min" {% if g.uom_type.value=='min' %}selected{% endif %}>min</option>
+                      <option value="max" {% if g.uom_type.value=='max' %}selected{% endif %}>max</option>
+                      <option value="timeline" {% if g.uom_type.value=='timeline' %}selected{% endif %}>timeline</option>
+                      <option value="zero" {% if g.uom_type.value=='zero' %}selected{% endif %}>zero</option>
+                    </select>
+                  </div>
+                  <div class="col-12 col-md-2">
+                    <label class="form-label mb-1">Target</label>
+                    <input class="form-control" name="target_value" value="{{ g.target_value }}" required {% if sheet.locked %}disabled{% endif %}>
+                  </div>
+                  <div class="col-12 col-md-2">
+                    <label class="form-label mb-1">Weight</label>
+                    <input class="form-control" type="number" name="weightage" min="10" max="100" value="{{ g.weightage }}" required {% if sheet.locked %}disabled{% endif %}>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label mb-1">Description</label>
+                    <input class="form-control" name="description" value="{{ g.description }}" {% if sheet.locked %}disabled{% endif %}>
+                  </div>
+                  {% if not sheet.locked %}
+                    <div class="col-12">
+                      <button class="btn btn-primary" type="submit">Save (Audit Logged)</button>
+                    </div>
+                  {% endif %}
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

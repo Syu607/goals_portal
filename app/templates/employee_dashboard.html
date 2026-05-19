@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h2 class="mb-1">Employee Dashboard</h2>
+    <div class="text-muted">Cycle {{ cycle.year }} | Goal setting window: {{ goal_setting_window.opens }} to {{ goal_setting_window.closes }}</div>
+  </div>
+  <div class="text-end">
+    <div><span class="badge bg-secondary">Sheet: {{ sheet.status.value }}</span>{% if sheet.locked %} <span class="badge bg-dark">Locked</span>{% endif %}</div>
+    <div class="small text-muted">Weight total: {{ weight_total }}%</div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-8">
+    <div class="card">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div>Goals</div>
+        <div class="small text-muted">Max 8 goals | Min 10% each | Total 100%</div>
+      </div>
+      <div class="card-body">
+        {% if goals|length == 0 %}
+          <div class="text-muted">No goals yet.</div>
+        {% else %}
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Thrust</th>
+                  <th>Title</th>
+                  <th>UoM</th>
+                  <th>Target</th>
+                  <th class="text-end">Weight %</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for g in goals %}
+                <tr>
+                  <td class="text-nowrap">{{ g.thrust_area }}</td>
+                  <td>
+                    <div class="fw-semibold">{{ g.title }}</div>
+                    {% if g.shared_group_id %}
+                      <div class="small text-muted">Shared goal{% if g.primary_owner_goal_id %} (synced){% endif %}</div>
+                    {% endif %}
+                    {% if g.description %}
+                      <div class="small text-muted">{{ g.description }}</div>
+                    {% endif %}
+                  </td>
+                  <td class="text-nowrap">{{ g.uom_type.value }}</td>
+                  <td class="text-nowrap">{{ g.target_value }}</td>
+                  <td class="text-end">{{ g.weightage }}</td>
+                  <td class="text-end">
+                    {% if can_edit_goals %}
+                      <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#edit{{ g.id }}">Edit</button>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% if can_edit_goals %}
+                <tr class="collapse" id="edit{{ g.id }}">
+                  <td colspan="6">
+                    <div class="row g-2">
+                      <div class="col-12">
+                        <form method="post" action="/employee/goals/{{ g.id }}/update" class="row g-2">
+                          {% if g.shared_group_id and g.primary_owner_goal_id %}
+                            <div class="col-12 col-md-3">
+                              <label class="form-label mb-1">Weightage</label>
+                              <input class="form-control form-control-sm" name="weightage" type="number" min="10" max="100" value="{{ g.weightage }}" required>
+                            </div>
+                          {% else %}
+                            <div class="col-12 col-md-2">
+                              <label class="form-label mb-1">Thrust Area</label>
+                              <input class="form-control form-control-sm" name="thrust_area" value="{{ g.thrust_area }}" required>
+                            </div>
+                            <div class="col-12 col-md-3">
+                              <label class="form-label mb-1">Title</label>
+                              <input class="form-control form-control-sm" name="title" value="{{ g.title }}" required>
+                            </div>
+                            <div class="col-12 col-md-3">
+                              <label class="form-label mb-1">Target</label>
+                              <input class="form-control form-control-sm" name="target_value" value="{{ g.target_value }}" required>
+                            </div>
+                            <div class="col-12 col-md-2">
+                              <label class="form-label mb-1">UoM</label>
+                              <select class="form-select form-select-sm" name="uom_type" required>
+                                <option value="min" {% if g.uom_type.value=='min' %}selected{% endif %}>min</option>
+                                <option value="max" {% if g.uom_type.value=='max' %}selected{% endif %}>max</option>
+                                <option value="timeline" {% if g.uom_type.value=='timeline' %}selected{% endif %}>timeline</option>
+                                <option value="zero" {% if g.uom_type.value=='zero' %}selected{% endif %}>zero</option>
+                              </select>
+                            </div>
+                            <div class="col-12 col-md-2">
+                              <label class="form-label mb-1">Weightage</label>
+                              <input class="form-control form-control-sm" name="weightage" type="number" min="10" max="100" value="{{ g.weightage }}" required>
+                            </div>
+                            <div class="col-12">
+                              <label class="form-label mb-1">Description</label>
+                              <input class="form-control form-control-sm" name="description" value="{{ g.description }}">
+                            </div>
+                          {% endif %}
+                          <div class="col-12 d-flex gap-2">
+                            <button class="btn btn-primary btn-sm" type="submit">Save</button>
+                          </div>
+                        </form>
+                      </div>
+                      {% if not (g.shared_group_id and g.primary_owner_goal_id) %}
+                      <div class="col-12">
+                        <form method="post" action="/employee/goals/{{ g.id }}/delete">
+                          <button class="btn btn-outline-danger btn-sm" type="submit">Delete goal</button>
+                        </form>
+                      </div>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-4">
+    <div class="card mb-3">
+      <div class="card-header">Actions</div>
+      <div class="card-body">
+        {% if can_edit_goals %}
+          <form method="post" action="/employee/submit">
+            <button class="btn btn-success w-100" type="submit">Submit goals to manager</button>
+          </form>
+        {% else %}
+          <div class="text-muted">Goal editing is disabled (either window closed or sheet submitted/locked).</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Quarterly Updates</div>
+      <div class="card-body d-grid gap-2">
+        <a class="btn btn-outline-primary" href="/employee/checkin/{{ Quarter.q1.value }}">Q1 Update</a>
+        <a class="btn btn-outline-primary" href="/employee/checkin/{{ Quarter.q2.value }}">Q2 Update</a>
+        <a class="btn btn-outline-primary" href="/employee/checkin/{{ Quarter.q3.value }}">Q3 Update</a>
+        <a class="btn btn-outline-primary" href="/employee/checkin/{{ Quarter.q4.value }}">Q4 / Annual</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if can_edit_goals %}
+<div class="card mt-3">
+  <div class="card-header">Add Goal</div>
+  <div class="card-body">
+    <form method="post" action="/employee/goals/add" class="row g-2">
+      <div class="col-12 col-md-2">
+        <label class="form-label mb-1">Thrust Area</label>
+        <input class="form-control" name="thrust_area" required>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label mb-1">Goal Title</label>
+        <input class="form-control" name="title" required>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label mb-1">Target</label>
+        <input class="form-control" name="target_value" required>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label mb-1">UoM</label>
+        <select class="form-select" name="uom_type" required>
+          <option value="min">min</option>
+          <option value="max">max</option>
+          <option value="timeline">timeline</option>
+          <option value="zero">zero</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label mb-1">Weightage %</label>
+        <input class="form-control" type="number" name="weightage" min="10" max="100" required>
+      </div>
+      <div class="col-12">
+        <label class="form-label mb-1">Description</label>
+        <input class="form-control" name="description">
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary" type="submit">Add</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

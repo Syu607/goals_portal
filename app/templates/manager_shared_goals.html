@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h2 class="mb-1">Push Shared Goal</h2>
+    <div class="text-muted">Cycle {{ cycle.year }} | Creates a synced KPI goal across selected employees.</div>
+  </div>
+  <a class="btn btn-outline-secondary" href="/manager">Back</a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <form method="post" action="/manager/shared-goals/push" class="row g-2">
+      <div class="col-12 col-md-3">
+        <label class="form-label mb-1">Thrust Area</label>
+        <input class="form-control" name="thrust_area" required>
+      </div>
+      <div class="col-12 col-md-5">
+        <label class="form-label mb-1">Goal Title</label>
+        <input class="form-control" name="title" required>
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label mb-1">Primary Owner</label>
+        <select class="form-select" name="primary_owner_id" required>
+          {% for m in team %}
+            <option value="{{ m.id }}">{{ m.full_name }} ({{ m.username }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12">
+        <label class="form-label mb-1">Description</label>
+        <input class="form-control" name="description">
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label mb-1">UoM</label>
+        <select class="form-select" name="uom_type" required>
+          <option value="min">min (higher is better)</option>
+          <option value="max">max (lower is better)</option>
+          <option value="timeline">timeline (YYYY-MM-DD)</option>
+          <option value="zero">zero (0 = success)</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-5">
+        <label class="form-label mb-1">Target Value</label>
+        <input class="form-control" name="target_value" required>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label mb-1">Default Weight %</label>
+        <input class="form-control" type="number" name="default_weightage" min="10" max="100" value="10" required>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label mb-1">Recipients</label>
+        <input class="form-control" name="recipient_ids" placeholder="e.g. 2,3" required>
+        <div class="form-text">Comma-separated employee IDs from list below.</div>
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary" type="submit">Push Shared Goal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header">Team IDs</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <thead>
+          <tr><th>ID</th><th>Name</th><th>Username</th></tr>
+        </thead>
+        <tbody>
+          {% for m in team %}
+            <tr><td>{{ m.id }}</td><td>{{ m.full_name }}</td><td>{{ m.username }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

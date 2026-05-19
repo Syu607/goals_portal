@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h2 class="mb-1">Admin / HR Dashboard</h2>
+    <div class="text-muted">Active cycle {{ cycle.year }}</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="/admin/audit">Audit Logs</a>
+    <a class="btn btn-outline-primary" href="/admin/reports/achievement.csv?quarter=q1">Export Q1 CSV</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-12 col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="text-muted">Submitted</div>
+        <div class="display-6">{{ submitted }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="text-muted">Approved (Locked)</div>
+        <div class="display-6">{{ approved }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="text-muted">Manager Check-ins (count)</div>
+        <div class="small">Q1: {{ checkin_counts['q1'] }} | Q2: {{ checkin_counts['q2'] }} | Q3: {{ checkin_counts['q3'] }} | Q4: {{ checkin_counts['q4'] }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header">Completion Dashboard</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Status</th>
+            <th>Locked</th>
+            <th class="text-nowrap">Q1</th>
+            <th class="text-nowrap">Q2</th>
+            <th class="text-nowrap">Q3</th>
+            <th class="text-nowrap">Q4</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in employees %}
+          {% set s = by_employee.get(e.id) %}
+          <tr>
+            <td>{{ e.full_name }} <span class="text-muted">({{ e.username }})</span></td>
+            <td>{% if s %}<span class="badge bg-secondary">{{ s.status.value }}</span>{% else %}<span class="badge bg-light text-dark">none</span>{% endif %}</td>
+            <td>{% if s and s.locked %}<span class="badge bg-dark">Yes</span>{% else %}<span class="badge bg-light text-dark">No</span>{% endif %}</td>
+            {% for q in ["q1","q2","q3","q4"] %}
+              {% set c = completion.get(e.id, {}).get(q, {"employee": false, "manager": false}) %}
+              <td class="text-nowrap">
+                <span class="badge {% if c.employee %}bg-success{% else %}bg-light text-dark{% endif %}">E</span>
+                <span class="badge {% if c.manager %}bg-success{% else %}bg-light text-dark{% endif %}">M</span>
+              </td>
+            {% endfor %}
+            <td class="text-end">
+              <a class="btn btn-outline-primary btn-sm" href="/admin/sheet/{{ e.id }}">Open</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">Cycle Management</div>
+  <div class="card-body">
+    <form method="post" action="/admin/cycle/update" class="row g-2">
+      <div class="col-12 col-md-2">
+        <label class="form-label mb-1">Year</label>
+        <input class="form-control" type="number" name="year" value="{{ cycle.year }}" required>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label mb-1">Goal Setting Open</label>
+        <input class="form-control" type="date" name="goal_setting_open" value="{{ cycle.goal_setting_open }}" required>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label mb-1">Q1 Open</label>
+        <input class="form-control" type="date" name="q1_open" value="{{ cycle.q1_open }}" required>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label mb-1">Q2 Open</label>
+        <input class="form-control" type="date" name="q2_open" value="{{ cycle.q2_open }}" required>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label mb-1">Q3 Open</label>
+        <input class="form-control" type="date" name="q3_open" value="{{ cycle.q3_open }}" required>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label mb-1">Q4 Open</label>
+        <input class="form-control" type="date" name="q4_open" value="{{ cycle.q4_open }}" required>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label mb-1">Window Days</label>
+        <input class="form-control" type="number" name="window_days" value="{{ cycle.window_days }}" required>
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary" type="submit">Save Cycle</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h2 class="mb-1">Manager Check-in: {{ quarter.value|upper }}</h2>
+    <div class="text-muted">{{ employee.full_name }} ({{ employee.username }}) | Window: {{ window.opens }} to {{ window.closes }}</div>
+  </div>
+  <a class="btn btn-outline-secondary" href="/manager">Back</a>
+</div>
+
+{% if not is_open %}
+  <div class="alert alert-warning">This quarter window is closed. Comment saving is disabled.</div>
+{% endif %}
+
+<div class="card mb-3">
+  <div class="card-header">Planned vs Achievement</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>Goal</th>
+            <th>Target</th>
+            <th>Actual</th>
+            <th>Status</th>
+            <th class="text-end">Progress</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+          <tr>
+            <td>
+              <div class="fw-semibold">{{ r.goal.title }}</div>
+              <div class="small text-muted">{{ r.goal.thrust_area }} | {{ r.goal.uom_type.value }}</div>
+              {% if r.goal.shared_group_id %}
+                <div class="small text-muted">Shared goal{% if r.goal.primary_owner_goal_id %} (synced){% endif %}</div>
+              {% endif %}
+            </td>
+            <td class="text-nowrap">{{ r.source_goal.target_value }}</td>
+            <td class="text-nowrap">{{ r.achievement.actual_value if r.achievement else "" }}</td>
+            <td class="text-nowrap">{{ r.achievement.status.value if r.achievement else "" }}</td>
+            <td class="text-end">{{ r.achievement.progress_score if r.achievement else 0 }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">Check-in Comment</div>
+  <div class="card-body">
+    <form method="post" action="/manager/checkin/{{ quarter.value }}/{{ employee.id }}">
+      <div class="mb-2">
+        <textarea class="form-control" name="comment" rows="4" {% if not is_open %}disabled{% endif %}>{{ checkin.comment if checkin else "" }}</textarea>
+      </div>
+      {% if is_open %}
+        <button class="btn btn-primary" type="submit">Save Comment</button>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}

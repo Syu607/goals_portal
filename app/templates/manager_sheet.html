@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h2 class="mb-1">Review Goal Sheet</h2>
+    <div class="text-muted">{{ employee.full_name }} ({{ employee.username }}) | Cycle {{ cycle.year }}</div>
+  </div>
+  <a class="btn btn-outline-secondary" href="/manager">Back</a>
+</div>
+
+<div class="mb-3">
+  <span class="badge bg-secondary">Status: {{ sheet.status.value }}</span>
+  {% if sheet.locked %}<span class="badge bg-dark">Locked</span>{% endif %}
+  <span class="ms-2 text-muted">Weight total: {{ weight_total }}%</span>
+</div>
+
+{% if sheet.status.value != "submitted" %}
+  <div class="alert alert-info">Sheet must be submitted by the employee before you can edit/approve.</div>
+{% endif %}
+
+<div class="card mb-3">
+  <div class="card-header">Goals</div>
+  <div class="card-body">
+    {% if goals|length == 0 %}
+      <div class="text-muted">No goals.</div>
+    {% else %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Goal</th>
+              <th>UoM</th>
+              <th>Target</th>
+              <th class="text-end">Weight %</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for g in goals %}
+            <tr>
+              <td>
+                <div class="fw-semibold">{{ g.title }}</div>
+                <div class="small text-muted">{{ g.thrust_area }}</div>
+                {% if g.shared_group_id %}
+                  <div class="small text-muted">Shared goal{% if g.primary_owner_goal_id %} (recipient){% else %} (primary){% endif %}</div>
+                {% endif %}
+              </td>
+              <td class="text-nowrap">{{ g.uom_type.value }}</td>
+              <td class="text-nowrap">{{ g.target_value }}</td>
+              <td class="text-end">{{ g.weightage }}</td>
+              <td class="text-end">
+                {% if sheet.status.value == "submitted" and not sheet.locked %}
+                  <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#e{{ g.id }}">Edit</button>
+                {% endif %}
+              </td>
+            </tr>
+            {% if sheet.status.value == "submitted" and not sheet.locked %}
+            <tr class="collapse" id="e{{ g.id }}">
+              <td colspan="5">
+                <form method="post" action="/manager/sheet/{{ sheet.id }}/goal/{{ g.id }}" class="row g-2">
+                  <div class="col-12 col-md-4">
+                    <label class="form-label mb-1">Target</label>
+                    <input class="form-control" name="target_value" value="{{ g.target_value }}" {% if g.shared_group_id and g.primary_owner_goal_id %}disabled{% endif %}>
+                    {% if g.shared_group_id and g.primary_owner_goal_id %}
+                      <div class="form-text">Recipient target is read-only.</div>
+                    {% endif %}
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <label class="form-label mb-1">Weightage</label>
+                    <input class="form-control" name="weightage" type="number" min="10" max="100" value="{{ g.weightage }}" required>
+                  </div>
+                  <div class="col-12 d-flex gap-2">
+                    <button class="btn btn-primary" type="submit">Save</button>
+                  </div>
+                </form>
+              </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% if sheet.status.value == "submitted" and not sheet.locked %}
+<div class="d-flex gap-2">
+  <form method="post" action="/manager/sheet/{{ sheet.id }}/approve">
+    <button class="btn btn-success" type="submit">Approve & Lock</button>
+  </form>
+  <form method="post" action="/manager/sheet/{{ sheet.id }}/return">
+    <button class="btn btn-outline-danger" type="submit">Return for Rework</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

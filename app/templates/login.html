@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-6 col-lg-5">
+    <h2 class="mb-3">Login</h2>
+    <div class="card">
+      <div class="card-body">
+        {% if error %}
+          <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+        <form method="post" action="/login">
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input class="form-control" name="username" value="{{ prefill_user }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" name="password" value="{{ prefill_pass }}" required>
+          </div>
+          <button class="btn btn-primary w-100" type="submit">Sign in</button>
+        </form>
+      </div>
+    </div>
+    <div class="mt-3 small text-muted">
+      Demo users:
+      <ul class="mb-0">
+        <li>admin / admin123</li>
+        <li>manager1 / manager123</li>
+        <li>employee1 / employee123</li>
+        <li>employee2 / employee123</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

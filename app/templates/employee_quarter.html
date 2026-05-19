@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h2 class="mb-1">Quarterly Update: {{ quarter.value|upper }}</h2>
+    <div class="text-muted">Window: {{ window.opens }} to {{ window.closes }}</div>
+  </div>
+  <a class="btn btn-outline-secondary" href="/employee">Back</a>
+</div>
+
+{% if not is_open %}
+  <div class="alert alert-warning">This quarter window is currently closed. Updates are disabled.</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>Goal</th>
+            <th>Target</th>
+            <th>Actual</th>
+            <th>Status</th>
+            <th class="text-end">Progress</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in goal_rows %}
+          <tr>
+            <td>
+              <div class="fw-semibold">{{ r.goal.title }}</div>
+              {% if r.goal.shared_group_id %}
+                <div class="small text-muted">Shared goal{% if r.goal.primary_owner_goal_id %} (synced){% endif %}</div>
+              {% endif %}
+              <div class="small text-muted">{{ r.goal.uom_type.value }} | {{ r.goal.thrust_area }}</div>
+            </td>
+            <td class="text-nowrap">{{ r.source_goal.target_value }}</td>
+            <td class="text-nowrap">{{ r.achievement.actual_value if r.achievement else "" }}</td>
+            <td class="text-nowrap">{{ r.achievement.status.value if r.achievement else "" }}</td>
+            <td class="text-end">{{ r.achievement.progress_score if r.achievement else 0 }}%</td>
+            <td class="text-end">
+              {% if is_open %}
+                <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#u{{ r.goal.id }}">Update</button>
+              {% endif %}
+            </td>
+          </tr>
+          {% if is_open %}
+          <tr class="collapse" id="u{{ r.goal.id }}">
+            <td colspan="6">
+              <form method="post" action="/employee/checkin/{{ quarter.value }}/goal/{{ r.goal.id }}" class="row g-2">
+                <div class="col-12 col-md-3">
+                  <label class="form-label mb-1">Status</label>
+                  <select class="form-select" name="status" required>
+                    <option value="not_started" {% if r.achievement and r.achievement.status.value=='not_started' %}selected{% endif %}>Not Started</option>
+                    <option value="on_track" {% if r.achievement and r.achievement.status.value=='on_track' %}selected{% endif %}>On Track</option>
+                    <option value="completed" {% if r.achievement and r.achievement.status.value=='completed' %}selected{% endif %}>Completed</option>
+                  </select>
+                </div>
+                <div class="col-12 col-md-4">
+                  <label class="form-label mb-1">Actual Value</label>
+                  <input class="form-control" name="actual_value" value="{{ r.achievement.actual_value if r.achievement else '' }}">
+                  <div class="form-text">Use numeric/% for min/max, YYYY-MM-DD for timeline, 0/number for zero-based.</div>
+                </div>
+                <div class="col-12 d-flex gap-2">
+                  <button class="btn btn-primary" type="submit">Save</button>
+                </div>
+              </form>
+            </td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

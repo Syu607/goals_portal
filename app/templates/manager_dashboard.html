@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h2 class="mb-1">Manager Dashboard</h2>
+    <div class="text-muted">Cycle {{ cycle.year }}</div>
+  </div>
+  <a class="btn btn-outline-primary" href="/manager/shared-goals">Push Shared Goal</a>
+</div>
+
+<div class="card">
+  <div class="card-header">My Team</div>
+  <div class="card-body">
+    {% if team|length == 0 %}
+      <div class="text-muted">No direct reports configured.</div>
+    {% else %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Sheet Status</th>
+              <th>Locked</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in team %}
+            {% set s = sheets[m.id] %}
+            <tr>
+              <td>{{ m.full_name }} <span class="text-muted">({{ m.username }})</span></td>
+              <td><span class="badge bg-secondary">{{ s.status.value }}</span></td>
+              <td>{% if s.locked %}<span class="badge bg-dark">Yes</span>{% else %}<span class="badge bg-light text-dark">No</span>{% endif %}</td>
+              <td class="text-end">
+                <a class="btn btn-outline-primary btn-sm" href="/manager/sheet/{{ m.id }}">Review</a>
+                <a class="btn btn-outline-secondary btn-sm" href="/manager/checkin/{{ Quarter.q1.value }}/{{ m.id }}">Q1</a>
+                <a class="btn btn-outline-secondary btn-sm" href="/manager/checkin/{{ Quarter.q2.value }}/{{ m.id }}">Q2</a>
+                <a class="btn btn-outline-secondary btn-sm" href="/manager/checkin/{{ Quarter.q3.value }}/{{ m.id }}">Q3</a>
+                <a class="btn btn-outline-secondary btn-sm" href="/manager/checkin/{{ Quarter.q4.value }}/{{ m.id }}">Q4</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
