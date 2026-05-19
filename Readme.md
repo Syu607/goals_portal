@@ -1,77 +1,27 @@
-# AtomQuest Hackathon 1.0 — In‑House Goal Setting & Tracking Portal
+# AtomQuest Hackathon 1.0 — One‑Page Submission
 
-## Working link
+## Working link (Live demo)
 
-- Hosted URL (Vercel): (paste deployed link here)
-- Demo URL (local): http://127.0.0.1:8000/
-
-Run locally:
-
-```bash
-cd C:\Users\msiza\Desktop\atomquest-goals-portal
-python -m pip install -r requirements.txt
-python -m uvicorn app.main:app --port 8000
-```
+- Vercel URL: https://<your-vercel-project>.vercel.app
 
 ## Source code repository
 
-- Repository URL: (paste GitHub/GitLab/Bitbucket link here)
+- GitHub: https://github.com/Syu607/goals_portal
 
-Suggested push commands:
-
-```bash
-cd C:\Users\msiza\Desktop\atomquest-goals-portal
-git remote add origin <YOUR_REPO_URL>
-git push -u origin master
-```
-
-## Deploy (Vercel — free)
-
-This repo includes `api/index.py` and `vercel.json` for Vercel deployment.
-
-Recommended Vercel env var:
-
-- `SESSION_SECRET` = any long random string (keeps sessions stable across restarts)
-
-Note: SQLite runs from ephemeral storage on Vercel (`/tmp`). This is fine for demo, but data may reset on cold starts.
-
-```bash
-cd C:\Users\msiza\Desktop\atomquest-goals-portal
-npm i -g vercel
-vercel login
-vercel --prod
-```
-
-## Login credentials (demo)
-
-- Admin / HR: `admin` / `admin123`
-- Manager (L1): `manager1` / `manager123`
-- Employee: `employee1` / `employee123`
-- Employee: `employee2` / `employee123`
-
-## Architecture diagram
-
+## Architecture diagram (high level)
 
 ```mermaid
 flowchart LR
-    U["Browser<br>Employee / Manager / Admin"] -->|HTTP| W["FastAPI Web App<br>Server-rendered UI (Jinja2)<br>Role-based Routes"]
-    W --> A["Auth<br>Session Cookie"]
-    W --> G["Goal Management<br>Draft → Submit → Approve/Lock<br>Shared Goals (Synced Achievements)"]
-    W --> C["Check-ins<br>Quarterly Updates + Manager Comments<br>Progress Score Formulas"]
-    W --> R["Reporting<br>CSV Export + Completion Dashboard"]
-    W --> L["Audit Trail<br>Field-level Change Logs After Unlock"]
-    W --> D[("SQLite Database")]
+  U[Browser\nEmployee / Manager / Admin] -->|HTTPS| V[Vercel Serverless Function\n@vercel/python]
+  V --> A[FastAPI + Jinja2 Templates\nRole-based routes + session auth]
+  A --> S[Services\nValidation, schedule windows,\nprogress scoring, audit logging]
+  A --> DB[(SQLite DB\n/tmp on Vercel, local data/portal.db)]
+  A --> R[Reports\nCSV export + completion dashboard]
 ```
 
+## Summary (what’s delivered)
 
-## Requirement coverage (Phase 1 + Phase 2)
-
-- Roles: Employee / Manager / Admin (separate dashboards + access control).
-- Goal creation: thrust area, title/description, UoM (min/max/timeline/zero), targets, weightage.
-- Validations at submission/approval: max 8 goals, min 10% per goal, total weightage = 100%.
-- Manager approval workflow: review submitted sheets, inline target/weight edits, approve (locks) or return for rework.
-- Shared goals: manager pushes a shared KPI to multiple employees; recipients can adjust weightage only; achievement updates are synced via the primary owner.
-- Quarterly updates: employees enter actuals and status; system computes progress score per UoM formula.
-- Manager check-ins: view planned vs actual, save structured comment per quarter.
-- Reporting: CSV export of planned vs actual (quarter parameter).
-- Governance: admin unlock/lock + audit trail for post-lock edits; completion dashboard (E/M completion per quarter).
+- A web-based Goal Setting & Tracking Portal supporting Employee, Manager (L1), and Admin/HR roles.
+- Phase 1: goal creation + validations (max 8 goals, min 10% each, total 100%), submission, manager inline edits, approve & lock, return for rework, shared goals with synced achievements.
+- Phase 2: quarterly achievement updates + status, computed progress scores by UoM formulas, manager check-in comments, schedule window enforcement.
+- Governance: admin lock/unlock with audit trail; dashboards and CSV export report.
