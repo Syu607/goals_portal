@@ -51,14 +51,26 @@ vercel --prod
 
 ## Architecture diagram
 
+```mermaid
 flowchart LR
-  U[Browser\n(Employee / Manager / Admin)] -->|HTTP| W[FastAPI Web App\nServer-rendered UI (Jinja2)\nRole-based routes]
-  W --> A[Auth\nSession cookie]
-  W --> G[Goal Mgmt\nDraft → Submit → Approve/Lock\nShared goals (synced achievements)]
-  W --> C[Check-ins\nQuarterly updates + manager comments\nProgress score formulas]
-  W --> R[Reporting\nCSV export + completion dashboard]
-  W --> L[Audit Trail\nField-level change logs after unlock]
-  W --> D[(SQLite DB)]
+
+    U[Browser<br/>Employee / Manager / Admin]
+    -->|HTTP|
+    W[FastAPI Web App<br/>Server-rendered UI (Jinja2)<br/>Role-based routes]
+
+    W --> A[Auth<br/>Session Cookie]
+
+    W --> G[Goal Management<br/>Draft → Submit → Approve/Lock<br/>Shared Goals (Synced Achievements)]
+
+    W --> C[Check-ins<br/>Quarterly Updates + Manager Comments<br/>Progress Score Formulas]
+
+    W --> R[Reporting<br/>CSV Export + Completion Dashboard]
+
+    W --> L[Audit Trail<br/>Field-level Change Logs After Unlock]
+
+    W --> D[(SQLite Database)]
+```
+
 
 ## Requirement coverage (Phase 1 + Phase 2)
 
