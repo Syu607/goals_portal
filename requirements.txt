@@ -5,3 +5,5 @@ python-multipart>=0.0.9
 sqlalchemy>=2.0
 passlib[bcrypt]>=1.7
 itsdangerous>=2.2
+mangum>=0.17
+psycopg2-binary>=2.9

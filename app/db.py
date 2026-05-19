@@ -28,19 +28,29 @@ from app.services.security import hash_password
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 
-if os.getenv("VERCEL") is not None:
-    DATA_DIR = Path(tempfile.gettempdir()) / "atomquest_goals_portal"
-else:
-    DATA_DIR = ROOT_DIR / "data"
-
-DB_PATH = DATA_DIR / "portal.db"
-
 
 def _database_url() -> str:
-    return f"sqlite:///{DB_PATH.as_posix()}"
+    for var in ("NETLIFY_DATABASE_URL", "DATABASE_URL"):
+        url = os.getenv(var)
+        if url:
+            return url.replace("postgres://", "postgresql://", 1) if url.startswith("postgres://") else url
+    if os.getenv("VERCEL") is not None:
+        data_dir = Path(tempfile.gettempdir()) / "atomquest_goals_portal"
+    else:
+        data_dir = ROOT_DIR / "data"
+    os.makedirs(data_dir, exist_ok=True)
+    return f"sqlite:///{(data_dir / 'portal.db').as_posix()}"
 
 
-engine = create_engine(_database_url(), connect_args={"check_same_thread": False})
+_DB_URL = _database_url()
+_is_postgres = _DB_URL.startswith("postgresql")
+
+if _is_postgres:
+    from sqlalchemy.pool import NullPool
+    engine = create_engine(_DB_URL, poolclass=NullPool)
+else:
+    engine = create_engine(_DB_URL, connect_args={"check_same_thread": False})
+
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
@@ -53,7 +63,6 @@ def get_db() -> Session:
 
 
 def init_db() -> None:
-    os.makedirs(DATA_DIR, exist_ok=True)
     Base.metadata.create_all(bind=engine)
     with Session(engine) as db:
         _seed_if_needed(db)
