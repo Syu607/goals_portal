@@ -2,7 +2,7 @@
 
 ## Working link (Live demo)
 
-- Vercel URL: https://<your-vercel-project>.vercel.app
+- Netlify URL: https://<your-netlify-site>.netlify.app
 
 ## Source code repository
 
@@ -12,10 +12,10 @@
 
 ```mermaid
 flowchart LR
-  U[Browser\nEmployee / Manager / Admin] -->|HTTPS| V[Vercel Serverless Function\n@vercel/python]
-  V --> A[FastAPI + Jinja2 Templates\nRole-based routes + session auth]
+  U[Browser\nEmployee / Manager / Admin] -->|HTTPS| H[Netlify Hosting]
+  H --> A[FastAPI + Jinja2 Templates\nRole-based routes + session auth]
   A --> S[Services\nValidation, schedule windows,\nprogress scoring, audit logging]
-  A --> DB[(SQLite DB\n/tmp on Vercel, local data/portal.db)]
+  A --> DB[(SQLite DB)]
   A --> R[Reports\nCSV export + completion dashboard]
 ```
 
