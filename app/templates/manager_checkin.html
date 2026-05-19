@@ -2,21 +2,22 @@
 {% block content %}
 <div class="d-flex align-items-center justify-content-between mb-3">
   <div>
-    <h2 class="mb-1">Manager Check-in: {{ quarter.value|upper }}</h2>
-    <div class="text-muted">{{ employee.full_name }} ({{ employee.username }}) | Window: {{ window.opens }} to {{ window.closes }}</div>
+    <div class="text-muted small">Manager Check-in</div>
+    <h2 class="mb-1">{{ quarter.value|upper }} Check-in</h2>
+    <div class="text-muted">{{ employee.full_name }} ({{ employee.username }}) • Window {{ window.opens }} → {{ window.closes }}</div>
   </div>
   <a class="btn btn-outline-secondary" href="/manager">Back</a>
 </div>
 
 {% if not is_open %}
-  <div class="alert alert-warning">This quarter window is closed. Comment saving is disabled.</div>
+  <div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-1"></i>This quarter window is closed. Comment saving is disabled.</div>
 {% endif %}
 
-<div class="card mb-3">
+<div class="card mb-3 rounded-4">
   <div class="card-header">Planned vs Achievement</div>
   <div class="card-body">
     <div class="table-responsive">
-      <table class="table table-sm align-middle">
+      <table class="table table-sm table-hover align-middle">
         <thead>
           <tr>
             <th>Goal</th>
@@ -39,7 +40,15 @@
             <td class="text-nowrap">{{ r.source_goal.target_value }}</td>
             <td class="text-nowrap">{{ r.achievement.actual_value if r.achievement else "" }}</td>
             <td class="text-nowrap">{{ r.achievement.status.value if r.achievement else "" }}</td>
-            <td class="text-end">{{ r.achievement.progress_score if r.achievement else 0 }}%</td>
+            <td class="text-end">
+              {% set p = (r.achievement.progress_score if r.achievement else 0) %}
+              <div class="d-flex align-items-center justify-content-end gap-2">
+                <div class="progress" style="width: 120px; height: 10px;">
+                  <div class="progress-bar {% if p==100 %}bg-success{% else %}bg-primary{% endif %}" style="width: {{ p }}%"></div>
+                </div>
+                <div class="text-nowrap">{{ p }}%</div>
+              </div>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -48,7 +57,7 @@
   </div>
 </div>
 
-<div class="card">
+<div class="card rounded-4">
   <div class="card-header">Check-in Comment</div>
   <div class="card-body">
     <form method="post" action="/manager/checkin/{{ quarter.value }}/{{ employee.id }}">
@@ -56,7 +65,7 @@
         <textarea class="form-control" name="comment" rows="4" {% if not is_open %}disabled{% endif %}>{{ checkin.comment if checkin else "" }}</textarea>
       </div>
       {% if is_open %}
-        <button class="btn btn-primary" type="submit">Save Comment</button>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-chat-left-text me-1"></i>Save Comment</button>
       {% endif %}
     </form>
   </div>

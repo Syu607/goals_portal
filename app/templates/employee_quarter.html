@@ -2,8 +2,9 @@
 {% block content %}
 <div class="d-flex align-items-center justify-content-between mb-3">
   <div>
+    <div class="text-muted small">Employee</div>
     <h2 class="mb-1">Quarterly Update: {{ quarter.value|upper }}</h2>
-    <div class="text-muted">Window: {{ window.opens }} to {{ window.closes }}</div>
+    <div class="text-muted">Window {{ window.opens }} → {{ window.closes }}</div>
   </div>
   <a class="btn btn-outline-secondary" href="/employee">Back</a>
 </div>
@@ -12,10 +13,10 @@
   <div class="alert alert-warning">This quarter window is currently closed. Updates are disabled.</div>
 {% endif %}
 
-<div class="card">
+<div class="card rounded-4">
   <div class="card-body">
     <div class="table-responsive">
-      <table class="table table-sm align-middle">
+      <table class="table table-sm table-hover align-middle">
         <thead>
           <tr>
             <th>Goal</th>
@@ -38,8 +39,28 @@
             </td>
             <td class="text-nowrap">{{ r.source_goal.target_value }}</td>
             <td class="text-nowrap">{{ r.achievement.actual_value if r.achievement else "" }}</td>
-            <td class="text-nowrap">{{ r.achievement.status.value if r.achievement else "" }}</td>
-            <td class="text-end">{{ r.achievement.progress_score if r.achievement else 0 }}%</td>
+            <td class="text-nowrap">
+              {% if r.achievement %}
+                {% if r.achievement.status.value == "completed" %}
+                  <span class="badge bg-success">Completed</span>
+                {% elif r.achievement.status.value == "on_track" %}
+                  <span class="badge bg-primary">On Track</span>
+                {% else %}
+                  <span class="badge bg-secondary">Not Started</span>
+                {% endif %}
+              {% else %}
+                <span class="badge bg-light text-dark">—</span>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              {% set p = (r.achievement.progress_score if r.achievement else 0) %}
+              <div class="d-flex align-items-center justify-content-end gap-2">
+                <div class="progress" style="width: 120px; height: 10px;">
+                  <div class="progress-bar {% if p==100 %}bg-success{% else %}bg-primary{% endif %}" style="width: {{ p }}%"></div>
+                </div>
+                <div class="text-nowrap">{{ p }}%</div>
+              </div>
+            </td>
             <td class="text-end">
               {% if is_open %}
                 <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#u{{ r.goal.id }}">Update</button>

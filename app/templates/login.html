@@ -1,34 +1,82 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-12 col-md-6 col-lg-5">
-    <h2 class="mb-3">Login</h2>
-    <div class="card">
-      <div class="card-body">
+<div class="row align-items-center justify-content-center g-4">
+  <div class="col-12 col-lg-6">
+    <div class="p-4 p-lg-5 rounded-4 kpi">
+      <div class="d-flex align-items-center gap-2 mb-2 text-primary">
+        <i class="bi bi-bullseye"></i>
+        <span class="fw-semibold">Goal Setting & Tracking</span>
+      </div>
+      <h1 class="display-6 mb-2">One portal for Goals, Approvals, and Quarterly Check-ins</h1>
+      <div class="text-muted mb-4">
+        Align employee goals to thrust areas, track achievements, and keep governance audit-ready.
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <span class="badge bg-light text-dark"><i class="bi bi-check2-circle me-1"></i>Weightage validation</span>
+        <span class="badge bg-light text-dark"><i class="bi bi-check2-circle me-1"></i>Manager approvals</span>
+        <span class="badge bg-light text-dark"><i class="bi bi-check2-circle me-1"></i>Shared goals</span>
+        <span class="badge bg-light text-dark"><i class="bi bi-check2-circle me-1"></i>Progress scoring</span>
+        <span class="badge bg-light text-dark"><i class="bi bi-check2-circle me-1"></i>Audit trail</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-8 col-lg-5">
+    <div class="card rounded-4">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h2 class="h4 mb-0">Sign in</h2>
+          <span class="badge bg-dark-subtle text-dark"><i class="bi bi-lightning-charge me-1"></i>Demo</span>
+        </div>
         {% if error %}
           <div class="alert alert-danger">{{ error }}</div>
         {% endif %}
-        <form method="post" action="/login">
-          <div class="mb-3">
+        <form method="post" action="/login" class="vstack gap-3">
+          <div>
             <label class="form-label">Username</label>
-            <input class="form-control" name="username" value="{{ prefill_user }}" required>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input class="form-control" name="username" value="{{ prefill_user }}" required>
+            </div>
           </div>
-          <div class="mb-3">
+          <div>
             <label class="form-label">Password</label>
-            <input type="password" class="form-control" name="password" value="{{ prefill_pass }}" required>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-key"></i></span>
+              <input type="password" class="form-control" name="password" value="{{ prefill_pass }}" required>
+            </div>
           </div>
-          <button class="btn btn-primary w-100" type="submit">Sign in</button>
+          <button class="btn btn-primary w-100" type="submit"><i class="bi bi-box-arrow-in-right me-1"></i>Sign in</button>
         </form>
+        <div class="mt-4">
+          <div class="text-muted small mb-2">Demo users</div>
+          <div class="row g-2 small">
+            <div class="col-12 col-md-6">
+              <div class="border rounded-3 p-2 bg-white">
+                <div class="fw-semibold">Admin</div>
+                <div class="text-muted">admin / admin123</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="border rounded-3 p-2 bg-white">
+                <div class="fw-semibold">Manager</div>
+                <div class="text-muted">manager1 / manager123</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="border rounded-3 p-2 bg-white">
+                <div class="fw-semibold">Employee</div>
+                <div class="text-muted">employee1 / employee123</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="border rounded-3 p-2 bg-white">
+                <div class="fw-semibold">Employee</div>
+                <div class="text-muted">employee2 / employee123</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="mt-3 small text-muted">
-      Demo users:
-      <ul class="mb-0">
-        <li>admin / admin123</li>
-        <li>manager1 / manager123</li>
-        <li>employee1 / employee123</li>
-        <li>employee2 / employee123</li>
-      </ul>
     </div>
   </div>
 </div>

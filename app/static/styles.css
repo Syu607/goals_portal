@@ -4,3 +4,53 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+body {
+  background:
+    radial-gradient(1200px 600px at 10% 0%, rgba(13, 110, 253, 0.10), transparent 60%),
+    radial-gradient(900px 500px at 90% 10%, rgba(102, 16, 242, 0.10), transparent 60%),
+    radial-gradient(1000px 600px at 50% 100%, rgba(25, 135, 84, 0.08), transparent 60%),
+    var(--bs-body-bg);
+}
+
+.brand-mark {
+  width: 10px;
+  height: 10px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #0d6efd, #6610f2);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+.card {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.card-header {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  font-weight: 600;
+}
+
+.table thead th {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badge {
+  letter-spacing: 0.03em;
+}
+
+.kpi {
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.12), rgba(102, 16, 242, 0.12));
+  border: 1px solid rgba(13, 110, 253, 0.10);
+}
+
+.kpi .display-6 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}

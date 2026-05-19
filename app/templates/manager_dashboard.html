@@ -1,21 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-3">
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
   <div>
-    <h2 class="mb-1">Manager Dashboard</h2>
+    <div class="text-muted small">Manager (L1)</div>
+    <h2 class="mb-1">Team Overview</h2>
     <div class="text-muted">Cycle {{ cycle.year }}</div>
   </div>
-  <a class="btn btn-outline-primary" href="/manager/shared-goals">Push Shared Goal</a>
+  <a class="btn btn-primary" href="/manager/shared-goals"><i class="bi bi-share me-1"></i>Push Shared Goal</a>
 </div>
 
-<div class="card">
+<div class="row g-3 mb-3">
+  <div class="col-12 col-md-4">
+    <div class="card rounded-4">
+      <div class="card-body">
+        <div class="text-muted small">Direct reports</div>
+        <div class="display-6">{{ team|length }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-8">
+    <div class="card rounded-4">
+      <div class="card-body">
+        <div class="text-muted small mb-2">Quick actions</div>
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-outline-secondary btn-sm" href="/manager"><i class="bi bi-arrow-repeat me-1"></i>Refresh</a>
+          <a class="btn btn-outline-primary btn-sm" href="/manager/shared-goals"><i class="bi bi-diagram-3 me-1"></i>Create shared KPI</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card rounded-4">
   <div class="card-header">My Team</div>
   <div class="card-body">
     {% if team|length == 0 %}
       <div class="text-muted">No direct reports configured.</div>
     {% else %}
       <div class="table-responsive">
-        <table class="table table-sm align-middle">
+        <table class="table table-sm table-hover align-middle">
           <thead>
             <tr>
               <th>Employee</th>
@@ -32,7 +55,8 @@
               <td><span class="badge bg-secondary">{{ s.status.value }}</span></td>
               <td>{% if s.locked %}<span class="badge bg-dark">Yes</span>{% else %}<span class="badge bg-light text-dark">No</span>{% endif %}</td>
               <td class="text-end">
-                <a class="btn btn-outline-primary btn-sm" href="/manager/sheet/{{ m.id }}">Review</a>
+                <a class="btn btn-outline-primary btn-sm" href="/manager/sheet/{{ m.id }}"><i class="bi bi-clipboard-check me-1"></i>Review</a>
+                <span class="ms-2 small text-muted">Check-ins:</span>
                 <a class="btn btn-outline-secondary btn-sm" href="/manager/checkin/{{ Quarter.q1.value }}/{{ m.id }}">Q1</a>
                 <a class="btn btn-outline-secondary btn-sm" href="/manager/checkin/{{ Quarter.q2.value }}/{{ m.id }}">Q2</a>
                 <a class="btn btn-outline-secondary btn-sm" href="/manager/checkin/{{ Quarter.q3.value }}/{{ m.id }}">Q3</a>

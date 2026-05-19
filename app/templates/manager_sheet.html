@@ -2,6 +2,7 @@
 {% block content %}
 <div class="d-flex align-items-center justify-content-between mb-3">
   <div>
+    <div class="text-muted small">Manager Review</div>
     <h2 class="mb-1">Review Goal Sheet</h2>
     <div class="text-muted">{{ employee.full_name }} ({{ employee.username }}) | Cycle {{ cycle.year }}</div>
   </div>
@@ -9,23 +10,23 @@
 </div>
 
 <div class="mb-3">
-  <span class="badge bg-secondary">Status: {{ sheet.status.value }}</span>
-  {% if sheet.locked %}<span class="badge bg-dark">Locked</span>{% endif %}
+  <span class="badge bg-dark-subtle text-dark text-uppercase">Status: {{ sheet.status.value }}</span>
+  {% if sheet.locked %}<span class="badge bg-dark"><i class="bi bi-lock-fill me-1"></i>Locked</span>{% endif %}
   <span class="ms-2 text-muted">Weight total: {{ weight_total }}%</span>
 </div>
 
 {% if sheet.status.value != "submitted" %}
-  <div class="alert alert-info">Sheet must be submitted by the employee before you can edit/approve.</div>
+  <div class="alert alert-info"><i class="bi bi-info-circle me-1"></i>Sheet must be submitted by the employee before you can edit/approve.</div>
 {% endif %}
 
-<div class="card mb-3">
+<div class="card mb-3 rounded-4">
   <div class="card-header">Goals</div>
   <div class="card-body">
     {% if goals|length == 0 %}
       <div class="text-muted">No goals.</div>
     {% else %}
       <div class="table-responsive">
-        <table class="table table-sm align-middle">
+        <table class="table table-sm table-hover align-middle">
           <thead>
             <tr>
               <th>Goal</th>
@@ -39,7 +40,12 @@
             {% for g in goals %}
             <tr>
               <td>
-                <div class="fw-semibold">{{ g.title }}</div>
+                <div class="fw-semibold d-flex align-items-center gap-2">
+                  <span>{{ g.title }}</span>
+                  {% if g.shared_group_id %}
+                    <span class="badge bg-info-subtle text-info-emphasis"><i class="bi bi-share me-1"></i>Shared</span>
+                  {% endif %}
+                </div>
                 <div class="small text-muted">{{ g.thrust_area }}</div>
                 {% if g.shared_group_id %}
                   <div class="small text-muted">Shared goal{% if g.primary_owner_goal_id %} (recipient){% else %} (primary){% endif %}</div>
@@ -87,10 +93,10 @@
 {% if sheet.status.value == "submitted" and not sheet.locked %}
 <div class="d-flex gap-2">
   <form method="post" action="/manager/sheet/{{ sheet.id }}/approve">
-    <button class="btn btn-success" type="submit">Approve & Lock</button>
+    <button class="btn btn-success" type="submit"><i class="bi bi-check2-circle me-1"></i>Approve & Lock</button>
   </form>
   <form method="post" action="/manager/sheet/{{ sheet.id }}/return">
-    <button class="btn btn-outline-danger" type="submit">Return for Rework</button>
+    <button class="btn btn-outline-danger" type="submit"><i class="bi bi-arrow-counterclockwise me-1"></i>Return for Rework</button>
   </form>
 </div>
 {% endif %}

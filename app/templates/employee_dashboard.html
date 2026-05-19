@@ -1,29 +1,72 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-3">
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
   <div>
-    <h2 class="mb-1">Employee Dashboard</h2>
-    <div class="text-muted">Cycle {{ cycle.year }} | Goal setting window: {{ goal_setting_window.opens }} to {{ goal_setting_window.closes }}</div>
+    <div class="text-muted small">Employee</div>
+    <h2 class="mb-1">My Goals</h2>
+    <div class="text-muted">Cycle {{ cycle.year }} • Goal setting window {{ goal_setting_window.opens }} → {{ goal_setting_window.closes }}</div>
   </div>
-  <div class="text-end">
-    <div><span class="badge bg-secondary">Sheet: {{ sheet.status.value }}</span>{% if sheet.locked %} <span class="badge bg-dark">Locked</span>{% endif %}</div>
-    <div class="small text-muted">Weight total: {{ weight_total }}%</div>
+  <div class="d-flex align-items-center gap-2">
+    <span class="badge bg-dark-subtle text-dark text-uppercase">Sheet: {{ sheet.status.value }}</span>
+    {% if sheet.locked %}<span class="badge bg-dark"><i class="bi bi-lock-fill me-1"></i>Locked</span>{% endif %}
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-12 col-md-4">
+    <div class="card rounded-4">
+      <div class="card-body">
+        <div class="text-muted small">Goals</div>
+        <div class="display-6">{{ goals|length }}</div>
+        <div class="text-muted small">Max 8</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="card rounded-4">
+      <div class="card-body">
+        <div class="text-muted small">Weightage Total</div>
+        <div class="display-6">{{ weight_total }}%</div>
+        <div class="progress" role="progressbar" aria-label="weightage" aria-valuenow="{{ weight_total }}" aria-valuemin="0" aria-valuemax="100" style="height: 10px;">
+          <div class="progress-bar {% if weight_total==100 %}bg-success{% else %}bg-primary{% endif %}" style="width: {{ weight_total }}%"></div>
+        </div>
+        <div class="text-muted small mt-2">Must equal 100%</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="card rounded-4">
+      <div class="card-body">
+        <div class="text-muted small">Edit Mode</div>
+        <div class="h4 mb-2">
+          {% if can_edit_goals %}
+            <span class="badge bg-success"><i class="bi bi-pencil-square me-1"></i>Enabled</span>
+          {% else %}
+            <span class="badge bg-secondary"><i class="bi bi-slash-circle me-1"></i>Disabled</span>
+          {% endif %}
+        </div>
+        <div class="text-muted small">Edits allowed only in Draft + open window</div>
+      </div>
+    </div>
   </div>
 </div>
 
 <div class="row g-3">
   <div class="col-12 col-lg-8">
     <div class="card">
-      <div class="card-header d-flex align-items-center justify-content-between">
-        <div>Goals</div>
-        <div class="small text-muted">Max 8 goals | Min 10% each | Total 100%</div>
+      <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-list-check text-primary"></i>
+          <div>Goals</div>
+        </div>
+        <div class="small text-muted">Max 8 • Min 10% each • Total 100%</div>
       </div>
       <div class="card-body">
         {% if goals|length == 0 %}
           <div class="text-muted">No goals yet.</div>
         {% else %}
           <div class="table-responsive">
-            <table class="table table-sm align-middle">
+            <table class="table table-sm table-hover align-middle">
               <thead>
                 <tr>
                   <th>Thrust</th>
@@ -39,9 +82,14 @@
                 <tr>
                   <td class="text-nowrap">{{ g.thrust_area }}</td>
                   <td>
-                    <div class="fw-semibold">{{ g.title }}</div>
+                    <div class="fw-semibold d-flex align-items-center gap-2">
+                      <span>{{ g.title }}</span>
+                      {% if g.shared_group_id %}
+                        <span class="badge bg-info-subtle text-info-emphasis"><i class="bi bi-share me-1"></i>Shared</span>
+                      {% endif %}
+                    </div>
                     {% if g.shared_group_id %}
-                      <div class="small text-muted">Shared goal{% if g.primary_owner_goal_id %} (synced){% endif %}</div>
+                      <div class="small text-muted">{% if g.primary_owner_goal_id %}Synced from primary owner{% else %}Primary owner{% endif %}</div>
                     {% endif %}
                     {% if g.description %}
                       <div class="small text-muted">{{ g.description }}</div>
@@ -124,12 +172,12 @@
   </div>
 
   <div class="col-12 col-lg-4">
-    <div class="card mb-3">
+    <div class="card mb-3 rounded-4">
       <div class="card-header">Actions</div>
       <div class="card-body">
         {% if can_edit_goals %}
           <form method="post" action="/employee/submit">
-            <button class="btn btn-success w-100" type="submit">Submit goals to manager</button>
+            <button class="btn btn-success w-100" type="submit"><i class="bi bi-send-check me-1"></i>Submit goals to manager</button>
           </form>
         {% else %}
           <div class="text-muted">Goal editing is disabled (either window closed or sheet submitted/locked).</div>
@@ -137,20 +185,20 @@
       </div>
     </div>
 
-    <div class="card">
+    <div class="card rounded-4">
       <div class="card-header">Quarterly Updates</div>
       <div class="card-body d-grid gap-2">
-        <a class="btn btn-outline-primary" href="/employee/checkin/{{ Quarter.q1.value }}">Q1 Update</a>
-        <a class="btn btn-outline-primary" href="/employee/checkin/{{ Quarter.q2.value }}">Q2 Update</a>
-        <a class="btn btn-outline-primary" href="/employee/checkin/{{ Quarter.q3.value }}">Q3 Update</a>
-        <a class="btn btn-outline-primary" href="/employee/checkin/{{ Quarter.q4.value }}">Q4 / Annual</a>
+        <a class="btn btn-outline-primary" href="/employee/checkin/{{ Quarter.q1.value }}"><i class="bi bi-calendar2-check me-1"></i>Q1 Update</a>
+        <a class="btn btn-outline-primary" href="/employee/checkin/{{ Quarter.q2.value }}"><i class="bi bi-calendar2-check me-1"></i>Q2 Update</a>
+        <a class="btn btn-outline-primary" href="/employee/checkin/{{ Quarter.q3.value }}"><i class="bi bi-calendar2-check me-1"></i>Q3 Update</a>
+        <a class="btn btn-outline-primary" href="/employee/checkin/{{ Quarter.q4.value }}"><i class="bi bi-calendar2-check me-1"></i>Q4 / Annual</a>
       </div>
     </div>
   </div>
 </div>
 
 {% if can_edit_goals %}
-<div class="card mt-3">
+<div class="card mt-3 rounded-4">
   <div class="card-header">Add Goal</div>
   <div class="card-body">
     <form method="post" action="/employee/goals/add" class="row g-2">
@@ -184,7 +232,7 @@
         <input class="form-control" name="description">
       </div>
       <div class="col-12">
-        <button class="btn btn-primary" type="submit">Add</button>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-plus-circle me-1"></i>Add</button>
       </div>
     </form>
   </div>
