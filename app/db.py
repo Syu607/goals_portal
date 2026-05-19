@@ -155,18 +155,24 @@ def _ensure_demo_data(db: Session) -> None:
     if manager is None or employee1 is None or employee2 is None:
         return
 
-    sheet1 = GoalSheet(
-        employee_id=employee1.id,
-        cycle_id=cycle.id,
-        status=GoalSheetStatus.approved,
-        locked=1,
-        submitted_at=datetime.utcnow(),
-        approved_at=datetime.utcnow(),
-        approved_by_id=manager.id,
-    )
-    sheet2 = GoalSheet(employee_id=employee2.id, cycle_id=cycle.id, status=GoalSheetStatus.draft, locked=0)
-    db.add_all([sheet1, sheet2])
-    db.flush()
+    sheet1 = db.scalar(select(GoalSheet).where(GoalSheet.employee_id == employee1.id, GoalSheet.cycle_id == cycle.id))
+    if sheet1 is None:
+        sheet1 = GoalSheet(employee_id=employee1.id, cycle_id=cycle.id)
+        db.add(sheet1)
+        db.flush()
+    sheet1.status = GoalSheetStatus.approved
+    sheet1.locked = 1
+    sheet1.submitted_at = sheet1.submitted_at or datetime.utcnow()
+    sheet1.approved_at = datetime.utcnow()
+    sheet1.approved_by_id = manager.id
+
+    sheet2 = db.scalar(select(GoalSheet).where(GoalSheet.employee_id == employee2.id, GoalSheet.cycle_id == cycle.id))
+    if sheet2 is None:
+        sheet2 = GoalSheet(employee_id=employee2.id, cycle_id=cycle.id)
+        db.add(sheet2)
+        db.flush()
+    sheet2.status = GoalSheetStatus.draft
+    sheet2.locked = 0
 
     group = SharedGoalGroup(
         created_by_id=manager.id,
